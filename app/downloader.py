@@ -34,11 +34,11 @@ def run_download(video_url: str):
     command = [
         YT_DLP_PATH,
         "-4",  # <-- Force IPv4
+        "--concurrent-fragments", "8",  # use up to 8 concurrent fragment downloads
         video_url,
         "-P",
         VIDEOS_DIR
     ]
-    
     # --- New Logic ---
     # Check if the cookie.txt file exists and add it to the command
     if os.path.isfile(COOKIE_FILE_PATH):
