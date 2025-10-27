@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from app.routers import yt, insta, x
 
 app = FastAPI(
@@ -8,14 +7,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Add CORS middleware to allow all origins
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
-)
+# CORS is handled by Nginx reverse proxy
+# No CORS middleware needed here to avoid duplicate headers
 
 # Include the routers from the separate files
 app.include_router(yt.router)
