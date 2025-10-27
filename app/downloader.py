@@ -8,7 +8,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 # Define paths relative to the project root
 VIDEOS_DIR = os.path.join(PROJECT_ROOT, "videos")
-YT_DLP_PATH = os.path.join(PROJECT_ROOT, "yt-dlp.exe")
+YT_DLP_PATH = os.path.join(PROJECT_ROOT, "yt-dlp")
+COOKIE_FILE_PATH = os.path.join(PROJECT_ROOT, "cookie.txt") # <-- Path to cookie file
 
 # Ensure the 'videos' directory exists on application startup
 os.makedirs(VIDEOS_DIR, exist_ok=True)
@@ -27,15 +28,28 @@ def run_download(video_url: str):
         raise HTTPException(status_code=500, 
                             detail="Server configuration error: yt-dlp executable not found.")
 
-    # Command: ./yt-dlp <url> -P ./videos/
+    # Command: ./yt-dlp -4 <url> -P ./videos/
     # -P specifies the output path
+    # -4 forces IPv4
     command = [
         YT_DLP_PATH,
+        "-4",  # <-- Force IPv4
         video_url,
         "-P",
         VIDEOS_DIR
     ]
     
+    # --- New Logic ---
+    # Check if the cookie.txt file exists and add it to the command
+    if os.path.isfile(COOKIE_FILE_PATH):
+        print(f"Using cookie file: {COOKIE_FILE_PATH}")
+        command.extend(["--cookies", COOKIE_FILE_PATH])
+    else:
+        print("cookie.txt not found. Proceeding without cookies.")
+    # --- End New Logic ---
+
+    print(f"Executing command: {' '.join(command)}")
+
     try:
         # Execute the command
         # We set a 10-minute timeout to prevent hangs
